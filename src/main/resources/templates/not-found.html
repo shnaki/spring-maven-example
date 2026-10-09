@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>TODOが見つかりません</title>
+    <link rel="stylesheet" th:href="@{/style.css}">
+</head>
+<body>
+<main>
+    <h1>TODOが見つかりません</h1>
+    <p th:text="${message}"></p>
+    <a th:href="@{/todos}">一覧に戻る</a>
+</main>
+</body>
+</html>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>学習用TODOアプリ</title>
+    <link rel="stylesheet" th:href="@{/style.css}">
+</head>
+<body>
+<main>
+    <header>
+        <p class="eyebrow">JAVA / SPRING / MAVEN</p>
+        <h1>やることリスト</h1>
+        <p>小さなタスクを追加して、一つずつ進めましょう。</p>
+    </header>
+    <section aria-labelledby="add-heading">
+        <h2 id="add-heading">TODOを追加</h2>
+        <form class="add-form" method="post" th:action="@{/todos}">
+            <label for="title">タイトル</label>
+            <div class="input-row">
+                <input id="title" name="title" type="text" placeholder="例：Mavenでテストを実行する"
+                       th:value="${title}" th:attr="aria-invalid=${error != null},aria-describedby=${error != null ? 'title-error' : null}" required>
+                <button type="submit">追加</button>
+            </div>
+            <p id="title-error" class="error" role="alert" th:if="${error}" th:text="${error}"></p>
+        </form>
+    </section>
+    <section aria-labelledby="list-heading">
+        <h2 id="list-heading">TODO一覧 <span class="count" th:text="${#lists.size(todos)}">0</span></h2>
+        <p class="empty" th:if="${#lists.isEmpty(todos)}">まだTODOがありません。最初のタスクを追加しましょう。</p>
+        <ul class="todo-list" th:unless="${#lists.isEmpty(todos)}">
+            <li th:each="todo : ${todos}" th:classappend="${todo.completed} ? 'completed'">
+                <div class="task">
+                    <span class="status" th:text="${todo.completed} ? '完了' : '未完了'">未完了</span>
+                    <span class="task-title" th:text="${todo.title}">タイトル</span>
+                </div>
+                <div class="actions">
+                    <form method="post" th:action="@{/todos/{id}/toggle(id=${todo.id})}">
+                        <button class="secondary" type="submit" th:text="${todo.completed} ? '未完了に戻す' : '完了にする'"
+                                th:attr="aria-label=${todo.title + (todo.completed ? 'を未完了に戻す' : 'を完了にする')}">完了にする</button>
+                    </form>
+                    <form method="post" th:action="@{/todos/{id}/delete(id=${todo.id})}">
+                        <button class="delete" type="submit" th:attr="aria-label=${todo.title + 'を削除する'}">削除</button>
+                    </form>
+                </div>
+            </li>
+        </ul>
+    </section>
+    <footer>メモリに保存されます。アプリを再起動するとTODOは消えます。</footer>
+</main>
+</body>
+</html>

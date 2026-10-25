@@ -101,6 +101,24 @@ java -jar target/todo-0.0.1-SNAPSHOT.jar
 
 Mavenは `compile` → `test` → `package` の順に処理します。`package` を指定すると、その前のテストも実行します。ビルド結果は `target/` に生成されます。Wrapperが使うMavenのバージョンは `.mvn/wrapper/maven-wrapper.properties` で固定しています。
 
+## Javadocのルール
+
+本体（`src/main/java`）の全クラス・record・メソッド・明示的なコンストラクターに、日本語の `/** ... */` 形式でJavadocを記述します。privateメソッド、getter/setter、`@Override` が付いたメソッドも対象です。テスト、フィールド、自動生成コードは対象外です。
+
+説明には役割や利用上の制約を記載し、引数には `@param`、戻り値があるメソッドには `@return` を付けます。recordの各構成要素も `@param` で説明します。呼び出し側が把握する必要のある例外条件は `@throws` に記載します。
+
+`checkstyle.xml` のルールをMavenの `validate` フェーズで検査します。Javadocや必要な引数・戻り値のタグが不足すると、`compile`・`test`・`package`・`verify` も失敗します。例外条件の説明が適切かどうかは、コードレビューで確認します。
+
+`maven-checkstyle-plugin` は3.6.0、Checkstyle本体は14.3.0に固定しています。
+
+```powershell
+# Javadocの検査のみ
+.\mvnw.cmd checkstyle:check
+
+# Javadocの検査・テスト・ビルド
+.\mvnw.cmd clean verify
+```
+
 ## 困ったとき
 
 - `JAVA_HOME` が設定されている場合はJDK 25のフォルダーを指すようにしてください。`.\mvnw.cmd -v` でMavenが使うJavaを確認できます。

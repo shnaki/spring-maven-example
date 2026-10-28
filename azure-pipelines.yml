@@ -41,9 +41,21 @@ jobs:
           failTaskOnMissingResultsFile: true
           testRunTitle: Maven tests (Java 25)
 
-      - task: PublishPipelineArtifact@1
-        displayName: Upload executable JAR
+      - task: CopyFiles@2
+        displayName: Stage executable JAR for publishing
         inputs:
-          targetPath: '$(Build.SourcesDirectory)/target/todo-0.0.1-SNAPSHOT.jar'
-          artifact: todo-app
-          publishLocation: pipeline
+          SourceFolder: '$(Build.SourcesDirectory)/target'
+          Contents: 'todo-0.0.1-SNAPSHOT.jar'
+          TargetFolder: '$(Build.ArtifactStagingDirectory)/todo-app'
+
+      - task: UniversalPackages@0
+        displayName: Publish executable JAR to Azure Artifacts
+        inputs:
+          command: publish
+          publishDirectory: '$(Build.ArtifactStagingDirectory)/todo-app'
+          feedsToUsePublish: internal
+          vstsFeedPublish: 'spring-maven-example/java-executable'
+          vstsFeedPackagePublish: todo-app
+          versionOption: custom
+          versionPublish: '1.0.$(Build.BuildId)'
+          packagePublishDescription: 'Executable Spring Boot JAR built by Azure Pipelines'

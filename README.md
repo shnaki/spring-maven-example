@@ -136,19 +136,21 @@ Mavenは `compile` → `test` → `package` の順に処理します。`package`
 
 無料枠が未付与の場合は、[Microsoftの無料枠の有効化手順](https://learn.microsoft.com/en-us/azure/devops/pipelines/licensing/concurrent-jobs?view=azure-devops#how-do-i-enable-the-free-tier-of-parallel-jobs)を確認してください。組織側の枠がない場合は、YAMLだけでは実行できません。
 
-### 実行可能JARをArtifactsにアップロードする
+### 実行可能JARをAzure Artifactsに公開する
 
-ビルド成功後、`PublishPipelineArtifact@1`で`target/todo-0.0.1-SNAPSHOT.jar`を`todo-app`という名前のPipeline Artifactとして公開します。`targetPath`はアップロードするファイルのパス、`artifact`は実行結果に表示する成果物名です。ビルドやテスト結果の公開に失敗した場合、JARのアップロードはスキップされます。
+ビルド成功後、`UniversalPackages@0`で`target/todo-0.0.1-SNAPSHOT.jar`を`todo-app`というUniversal Packageとして、指定したAzure Artifacts Feedに公開します。パッケージバージョンはパイプライン実行ごとに`1.0.<BuildId>`を割り当てます。同じバージョンは再公開できないため、再実行すると別のBuild IDになります。
+
+Azure DevOpsプロジェクト`spring-maven-example`のプロジェクトスコープFeed`java-executable`へ公開する設定です。FeedのプロジェクトスコープにパイプラインのビルドサービスIDがパッケージを公開できる権限を持つ必要があります。
 
 このアプリは組み込みWebサーバーと依存ライブラリを含む実行可能JARです。WARとして外部のアプリケーションサーバーに配置する構成ではありません。公開するのはJARのみで、`target`内のテストレポートや再パッケージ前の`.jar.original`は含めません。`pom.xml`のバージョンなどを変更してJAR名が変わる場合は、YAMLの`targetPath`も更新してください。
 
-1. 変更をAzure DevOpsのリポジトリに反映し、パイプラインを実行する。
-2. 成功した実行のSummaryでArtifacts（公開済み成果物）を開く。
-3. `todo-app`を選び、`todo-0.0.1-SNAPSHOT.jar`をダウンロードする（ZIPで取得した場合は展開する）。
+1. Feedを作成してビルドサービスに公開権限を設定し、パイプラインを実行する。
+2. **Artifacts → 対象Feed → todo-app** を開き、実行IDに対応するバージョンを選ぶ。
+3. Universal Packageをダウンロード・展開し、含まれるJARを確認する。
 4. JDK 25を用意し、JARのあるフォルダーで`java -jar todo-0.0.1-SNAPSHOT.jar`を実行する。
 5. ブラウザーで`http://localhost:8080`を開く。停止する場合は`Ctrl+C`を押す。
 
-これは実行ごとにファイルを保存するPipeline Artifactsの例です。Azure ArtifactsのMavenフィードへのパッケージ公開とは別の機能で、フィードやAWSの接続設定は不要です。実行を削除すると、その実行に紐づく成果物も削除されます。詳細は[MicrosoftのPipeline Artifactsの説明](https://learn.microsoft.com/en-us/azure/devops/pipelines/artifacts/pipeline-artifacts?view=azure-devops&tabs=yaml)を参照してください。
+これは実行結果に一時添付するPipeline Artifactsではなく、Feedにバージョン付きで保存するUniversal Packageの例です。Universal Packagesは任意のファイルをまとめられるため、このアプリのJARをパッケージとして配布する用途に使えます。詳細は[Universal Packagesの発行タスク](https://learn.microsoft.com/en-us/azure/devops/pipelines/tasks/reference/universal-packages-v0?view=azure-pipelines)と[Feedへの発行・ダウンロード](https://learn.microsoft.com/en-us/azure/devops/pipelines/artifacts/universal-packages?view=azure-devops)を参照してください。
 
 ## AWSへのデプロイを学ぶ
 

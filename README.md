@@ -136,6 +136,10 @@ Mavenは `compile` → `test` → `package` の順に処理します。`package`
 
 無料枠が未付与の場合は、[Microsoftの無料枠の有効化手順](https://learn.microsoft.com/en-us/azure/devops/pipelines/licensing/concurrent-jobs?view=azure-devops#how-do-i-enable-the-free-tier-of-parallel-jobs)を確認してください。組織側の枠がない場合は、YAMLだけでは実行できません。
 
+## AWSへのデプロイを学ぶ
+
+[Azure DevOpsからAWSへOIDCで接続する](docs/azure-devops-aws-oidc.md)に、AWS側・Azure DevOps側の設定、認証確認用YAML、ECR/ECSへのデプロイの全体像をまとめています。学習用の資料で、現在のパイプラインにAWS連携は追加していません。
+
 ## 困ったとき
 
 - `JAVA_HOME` が設定されている場合はJDK 25のフォルダーを指すようにしてください。`.\mvnw.cmd -v` でMavenが使うJavaを確認できます。

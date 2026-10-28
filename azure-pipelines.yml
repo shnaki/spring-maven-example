@@ -8,8 +8,8 @@ pool:
   vmImage: ubuntu-24.04
 
 jobs:
-  - job: MavenTest
-    displayName: Maven tests (Java 25)
+  - job: MavenBuild
+    displayName: Maven build (Java 25)
     timeoutInMinutes: 15
     steps:
       - checkout: self
@@ -25,8 +25,8 @@ jobs:
           set -euo pipefail
           java -version
           sh ./mvnw --version
-          sh ./mvnw --batch-mode --no-transfer-progress clean test
-        displayName: Run Maven tests and Javadoc checks
+          sh ./mvnw --batch-mode --no-transfer-progress clean package
+        displayName: Test and package executable JAR
 
       - task: PublishTestResults@2
         displayName: Publish JUnit test results
@@ -40,3 +40,10 @@ jobs:
           failTaskOnFailureToPublishResults: true
           failTaskOnMissingResultsFile: true
           testRunTitle: Maven tests (Java 25)
+
+      - task: PublishPipelineArtifact@1
+        displayName: Upload executable JAR
+        inputs:
+          targetPath: '$(Build.SourcesDirectory)/target/todo-0.0.1-SNAPSHOT.jar'
+          artifact: todo-app
+          publishLocation: pipeline

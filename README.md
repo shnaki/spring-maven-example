@@ -119,9 +119,9 @@ Mavenは `compile` → `test` → `package` の順に処理します。`package`
 .\mvnw.cmd clean verify
 ```
 
-## Azure Pipelinesでテストする
+## Azure Pipelinesでテスト・ビルドする
 
-`azure-pipelines.yml` は、MicrosoftホストのUbuntu 24.04エージェントでJDK 25を選択し、Maven Wrapperで `clean test` を実行します。Javadoc検査も含まれ、JUnitの結果は実行画面のTestsタブで確認できます。テスト失敗時も結果を公開します。
+`azure-pipelines.yml` は、MicrosoftホストのUbuntu 24.04エージェントでJDK 25を選択し、Maven Wrapperで `clean package` を実行します。Javadoc検査・テスト・実行可能JARの作成を行い、JUnitの結果は実行画面のTestsタブで確認できます。テスト失敗時も結果を公開します。
 
 初回はAzure DevOpsで次の操作を行います。YAMLをプッシュしただけではPipelineは登録されません。
 
@@ -135,6 +135,20 @@ Mavenは `compile` → `test` → `package` の順に処理します。`package`
 無料枠を使うには、**Organization settings → Pipelines → Parallel jobs** でMicrosoft-hostedの無料枠が有効になっていることを確認してください。非公開プロジェクトの無料枠は組織全体で1並列ジョブ・1回最大60分・月1,800分です。このYAMLは有料枠を購入したり、組織の課金設定を変更したりしません。
 
 無料枠が未付与の場合は、[Microsoftの無料枠の有効化手順](https://learn.microsoft.com/en-us/azure/devops/pipelines/licensing/concurrent-jobs?view=azure-devops#how-do-i-enable-the-free-tier-of-parallel-jobs)を確認してください。組織側の枠がない場合は、YAMLだけでは実行できません。
+
+### 実行可能JARをArtifactsにアップロードする
+
+ビルド成功後、`PublishPipelineArtifact@1`で`target/todo-0.0.1-SNAPSHOT.jar`を`todo-app`という名前のPipeline Artifactとして公開します。`targetPath`はアップロードするファイルのパス、`artifact`は実行結果に表示する成果物名です。ビルドやテスト結果の公開に失敗した場合、JARのアップロードはスキップされます。
+
+このアプリは組み込みWebサーバーと依存ライブラリを含む実行可能JARです。WARとして外部のアプリケーションサーバーに配置する構成ではありません。公開するのはJARのみで、`target`内のテストレポートや再パッケージ前の`.jar.original`は含めません。`pom.xml`のバージョンなどを変更してJAR名が変わる場合は、YAMLの`targetPath`も更新してください。
+
+1. 変更をAzure DevOpsのリポジトリに反映し、パイプラインを実行する。
+2. 成功した実行のSummaryでArtifacts（公開済み成果物）を開く。
+3. `todo-app`を選び、`todo-0.0.1-SNAPSHOT.jar`をダウンロードする（ZIPで取得した場合は展開する）。
+4. JDK 25を用意し、JARのあるフォルダーで`java -jar todo-0.0.1-SNAPSHOT.jar`を実行する。
+5. ブラウザーで`http://localhost:8080`を開く。停止する場合は`Ctrl+C`を押す。
+
+これは実行ごとにファイルを保存するPipeline Artifactsの例です。Azure ArtifactsのMavenフィードへのパッケージ公開とは別の機能で、フィードやAWSの接続設定は不要です。実行を削除すると、その実行に紐づく成果物も削除されます。詳細は[MicrosoftのPipeline Artifactsの説明](https://learn.microsoft.com/en-us/azure/devops/pipelines/artifacts/pipeline-artifacts?view=azure-devops&tabs=yaml)を参照してください。
 
 ## AWSへのデプロイを学ぶ
 

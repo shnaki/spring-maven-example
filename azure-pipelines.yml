@@ -54,7 +54,7 @@ jobs:
           command: publish
           publishDirectory: '$(Build.ArtifactStagingDirectory)/todo-app'
           feedsToUsePublish: internal
-          vstsFeedPublish: 'spring-maven-example/java-executable'
+          vstsFeedPublish: 'spring-maven-example/jar-executable'
           vstsFeedPackagePublish: todo-app
           versionOption: custom
           versionPublish: '1.0.$(Build.BuildId)'

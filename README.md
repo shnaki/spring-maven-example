@@ -140,7 +140,7 @@ Mavenは `compile` → `test` → `package` の順に処理します。`package`
 
 ビルド成功後、`UniversalPackages@0`で`target/todo-0.0.1-SNAPSHOT.jar`を`todo-app`というUniversal Packageとして、指定したAzure Artifacts Feedに公開します。パッケージバージョンはパイプライン実行ごとに`1.0.<BuildId>`を割り当てます。同じバージョンは再公開できないため、再実行すると別のBuild IDになります。
 
-Azure DevOpsプロジェクト`spring-maven-example`のプロジェクトスコープFeed`java-executable`へ公開する設定です。FeedのプロジェクトスコープにパイプラインのビルドサービスIDがパッケージを公開できる権限を持つ必要があります。
+Azure DevOpsプロジェクト`spring-maven-example`のプロジェクトスコープFeed`jar-executable`へ公開する設定です。FeedのプロジェクトスコープにパイプラインのビルドサービスIDがパッケージを公開できる権限を持つ必要があります。
 
 このアプリは組み込みWebサーバーと依存ライブラリを含む実行可能JARです。WARとして外部のアプリケーションサーバーに配置する構成ではありません。公開するのはJARのみで、`target`内のテストレポートや再パッケージ前の`.jar.original`は含めません。`pom.xml`のバージョンなどを変更してJAR名が変わる場合は、YAMLの`targetPath`も更新してください。
 

@@ -1,0 +1,42 @@
+trigger:
+  batch: true
+  branches:
+    include:
+      - main
+
+pool:
+  vmImage: ubuntu-24.04
+
+jobs:
+  - job: MavenTest
+    displayName: Maven tests (Java 25)
+    timeoutInMinutes: 15
+    steps:
+      - checkout: self
+
+      - task: JavaToolInstaller@0
+        displayName: Select JDK 25
+        inputs:
+          versionSpec: '25'
+          jdkArchitectureOption: x64
+          jdkSourceOption: PreInstalled
+
+      - bash: |
+          set -euo pipefail
+          java -version
+          sh ./mvnw --version
+          sh ./mvnw --batch-mode --no-transfer-progress clean test
+        displayName: Run Maven tests and Javadoc checks
+
+      - task: PublishTestResults@2
+        displayName: Publish JUnit test results
+        condition: succeededOrFailed()
+        inputs:
+          testResultsFormat: JUnit
+          testResultsFiles: '**/surefire-reports/TEST-*.xml'
+          searchFolder: '$(System.DefaultWorkingDirectory)'
+          mergeTestResults: true
+          failTaskOnFailedTests: true
+          failTaskOnFailureToPublishResults: true
+          failTaskOnMissingResultsFile: true
+          testRunTitle: Maven tests (Java 25)

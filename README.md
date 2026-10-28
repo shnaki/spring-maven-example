@@ -119,6 +119,23 @@ Mavenは `compile` → `test` → `package` の順に処理します。`package`
 .\mvnw.cmd clean verify
 ```
 
+## Azure Pipelinesでテストする
+
+`azure-pipelines.yml` は、MicrosoftホストのUbuntu 24.04エージェントでJDK 25を選択し、Maven Wrapperで `clean test` を実行します。Javadoc検査も含まれ、JUnitの結果は実行画面のTestsタブで確認できます。テスト失敗時も結果を公開します。
+
+初回はAzure DevOpsで次の操作を行います。YAMLをプッシュしただけではPipelineは登録されません。
+
+1. `spring-maven-example` プロジェクトの **Pipelines → New pipeline** を開く。
+2. **Azure Repos Git** を選び、`spring-maven-example` リポジトリを選ぶ。
+3. **Existing Azure Pipelines YAML file** を選び、ブランチ `main`、パス `/azure-pipelines.yml` を指定する。
+4. **Run** で初回実行する。以後は `main` へのプッシュで自動実行される。
+
+1回の実行は1ジョブ・最大15分です。実行中に追加のプッシュがあった場合は、次回の実行にまとめます。手動実行も可能です。Azure Reposのプルリクエスト検証は、必要に応じてブランチポリシーのBuild validationで別途設定します。
+
+無料枠を使うには、**Organization settings → Pipelines → Parallel jobs** でMicrosoft-hostedの無料枠が有効になっていることを確認してください。非公開プロジェクトの無料枠は組織全体で1並列ジョブ・1回最大60分・月1,800分です。このYAMLは有料枠を購入したり、組織の課金設定を変更したりしません。
+
+無料枠が未付与の場合は、[Microsoftの無料枠の有効化手順](https://learn.microsoft.com/en-us/azure/devops/pipelines/licensing/concurrent-jobs?view=azure-devops#how-do-i-enable-the-free-tier-of-parallel-jobs)を確認してください。組織側の枠がない場合は、YAMLだけでは実行できません。
+
 ## 困ったとき
 
 - `JAVA_HOME` が設定されている場合はJDK 25のフォルダーを指すようにしてください。`.\mvnw.cmd -v` でMavenが使うJavaを確認できます。

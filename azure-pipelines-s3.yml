@@ -1,0 +1,49 @@
+trigger: none
+pr: none
+
+parameters:
+  - name: awsServiceConnection
+    displayName: AWS Service Connection (OIDC)
+    type: string
+    default: aws-oidc
+  - name: awsRegion
+    displayName: S3 bucket region
+    type: string
+    default: ap-northeast-1
+  - name: s3Bucket
+    displayName: Existing S3 bucket name
+    type: string
+    default: shnaki-work-apne1-dev
+
+pool:
+  vmImage: ubuntu-24.04
+
+jobs:
+  - job: S3Upload
+    displayName: Upload a test file to S3 via OIDC
+    timeoutInMinutes: 5
+    steps:
+      - checkout: none
+
+      - task: AWSShellScript@1
+        displayName: Check AWS identity and upload hello.txt
+        inputs:
+          awsCredentials: ${{ parameters.awsServiceConnection }}
+          regionName: ${{ parameters.awsRegion }}
+          scriptType: inline
+          inlineScript: |
+            set -euo pipefail
+            : "${S3_BUCKET:?Specify an existing S3 bucket name}"
+            aws sts get-caller-identity
+            file_path="${AGENT_TEMPDIRECTORY}/hello.txt"
+            object_key="pipeline-test/${BUILD_BUILDID}/hello.txt"
+            printf 'Hello from Azure Pipelines!\nBuild ID: %s\n' "$BUILD_BUILDID" > "$file_path"
+            aws s3api put-object \
+              --bucket "$S3_BUCKET" \
+              --key "$object_key" \
+              --body "$file_path" \
+              --content-type text/plain \
+              --server-side-encryption AES256
+            printf 'Uploaded: s3://%s/%s\n' "$S3_BUCKET" "$object_key"
+        env:
+          S3_BUCKET: ${{ parameters.s3Bucket }}

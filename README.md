@@ -154,7 +154,9 @@ Azure DevOpsプロジェクト`spring-maven-example`のプロジェクトスコ�
 
 ## AWSへのデプロイを学ぶ
 
-[Azure DevOpsからAWSへOIDCで接続する](docs/azure-devops-aws-oidc.md)に、AWS側・Azure DevOps側の設定、認証確認用YAML、ECR/ECSへのデプロイの全体像をまとめています。学習用の資料で、現在のパイプラインにAWS連携は追加していません。
+[Azure PipelinesからS3にファイルを置く](docs/azure-pipelines-s3.md)の手順で、`azure-pipelines-s3.yml`を手動実行し、OIDC経由で`hello.txt`をS3にアップロードできます。接続名・リージョン・バケット名は実行時に指定します。
+
+[Azure DevOpsからAWSへOIDCで接続する](docs/azure-devops-aws-oidc.md)に、AWS側・Azure DevOps側の接続設定、認証確認用YAML、ECR/ECSへのデプロイの全体像をまとめています。
 
 ## 困ったとき
 

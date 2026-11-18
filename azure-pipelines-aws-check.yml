@@ -1,0 +1,14 @@
+trigger: none
+pr: none
+
+pool:
+  vmImage: ubuntu-24.04
+
+steps:
+  - checkout: none
+  - task: AWSCLI@1
+    inputs:
+      awsCredentials: aws-oidc
+      regionName: ap-northeast-1
+      awsCommand: sts
+      awsSubCommand: get-caller-identity
